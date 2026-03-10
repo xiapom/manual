@@ -2213,6 +2213,15 @@
         let sidebarCollapsed = false;
         let mapState = { zoom: 1, panX: 0, panY: 0, isDragging: false, lastX: 0, lastY: 0 };
         let feedCooldown = false;
+        let searchResults = [];
+        const viewFilters = {
+            wiki: { search: '', category: 'all' },
+            npcs: { search: '', status: 'all' },
+            bestiary: { search: '', type: 'all' },
+            quests: { search: '', status: 'all' },
+            items: { search: '', type: 'all', rarity: 'all' },
+            sessions: { search: '' }
+        };
 
         // ============================================
         // STORAGE LAYER (IndexedDB + LocalStorage Fallback)
@@ -2394,6 +2403,52 @@
         function truncate(str, length = 100) {
             if (!str || str.length <= length) return str;
             return str.substring(0, length) + '...';
+        }
+
+        function normalizeText(value) {
+            return (value || '')
+                .toString()
+                .normalize('NFD')
+                .replace(/[\u0300-\u036f]/g, '')
+                .toLowerCase();
+        }
+
+        function matchesSearch(item, fields, query) {
+            const normalizedQuery = normalizeText(query);
+            if (!normalizedQuery) return true;
+            return fields.some(field => normalizeText(item[field]).includes(normalizedQuery));
+        }
+
+        function setViewFilter(module, key, value) {
+            if (!viewFilters[module]) return;
+            viewFilters[module][key] = value;
+            navigateTo(module);
+        }
+
+        function clearViewFilters(module) {
+            if (!viewFilters[module]) return;
+            Object.keys(viewFilters[module]).forEach(key => {
+                viewFilters[module][key] = key === 'category' ? 'all' : '';
+                if (key === 'status' || key === 'type' || key === 'rarity') {
+                    viewFilters[module][key] = 'all';
+                }
+            });
+            navigateTo(module);
+        }
+
+        function renderFilterBar(module, controls) {
+            return `
+                <div class="card" style="margin-bottom: var(--space-lg);">
+                    <div class="card-body">
+                        <div class="form-row">
+                            ${controls.join('')}
+                            <div class="form-group" style="align-self: end;">
+                                <button class="btn btn-secondary" onclick="clearViewFilters('${module}')">Limpar</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
         }
 
         // ============================================
@@ -3604,6 +3659,8 @@ Contém os verdadeiros nomes dos deuses antigos. Quem os conhece tem poder sobre
             const totalSessions = sessions.length;
             const totalCharacters = characters.length;
             const totalNPCs = npcs.length;
+            const filters = viewFilters.quests;
+            const questStatuses = [...new Set(quests.map(q => q.status).filter(Boolean))];
             
             content.innerHTML = `
                 <div class="page-header">
@@ -3651,6 +3708,20 @@ Contém os verdadeiros nomes dos deuses antigos. Quem os conhece tem poder sobre
                     </div>
                 </div>
                 
+                ${renderFilterBar('quests', [
+                    `<div class="form-group" style="flex: 2;">
+                        <label class="form-label">Buscar</label>
+                        <input type="text" class="form-input" value="${escapeHtml(filters.search)}" placeholder="Título, NPC, local ou recompensa" onchange="setViewFilter('quests', 'search', this.value)">
+                    </div>`,
+                    `<div class="form-group">
+                        <label class="form-label">Status</label>
+                        <select class="form-input" onchange="setViewFilter('quests', 'status', this.value)">
+                            <option value="all" ${filters.status === 'all' ? 'selected' : ''}>Todos</option>
+                            ${questStatuses.map(status => `<option value="${status}" ${filters.status === status ? 'selected' : ''}>${status}</option>`).join('')}
+                        </select>
+                    </div>`
+                ])}
+
                 <div class="grid grid-2">
                     <div class="card">
                         <div class="card-header">
@@ -3750,8 +3821,15 @@ Contém os verdadeiros nomes dos deuses antigos. Quem os conhece tem poder sobre
         async function renderWiki() {
             const content = document.getElementById('content');
             const pages = await dbGetAll('wiki_pages');
+            const filters = viewFilters.wiki;
             
             const categories = [...new Set(pages.map(p => p.category))];
+            const filteredPages = pages.filter(p => {
+                const matchesCategory = filters.category === 'all' || p.category === filters.category;
+                const matchesText = matchesSearch(p, ['name', 'category', 'content'], filters.search);
+                const canView = p.public || currentUser.role === 'master';
+                return canView && matchesCategory && matchesText;
+            });
             
             content.innerHTML = `
                 <div class="page-header">
@@ -3763,15 +3841,29 @@ Contém os verdadeiros nomes dos deuses antigos. Quem os conhece tem poder sobre
                         ${!isReadOnly ? `<button class="btn btn-primary" onclick="openWikiModal()">+ Nova Página</button>` : ''}
                     </div>
                 </div>
+
+                ${renderFilterBar('wiki', [
+                    `<div class="form-group" style="flex: 2;">
+                        <label class="form-label">Buscar</label>
+                        <input type="text" class="form-input" value="${escapeHtml(filters.search)}" placeholder="Nome, categoria ou conteúdo" onchange="setViewFilter('wiki', 'search', this.value)">
+                    </div>`
+                ])}
                 
                 <div class="tabs">
-                    <div class="tab active" onclick="filterWiki('all', this)">Todas</div>
-                    ${categories.map(c => `<div class="tab" onclick="filterWiki('${c}', this)">${c}</div>`).join('')}
+                    <div class="tab ${filters.category === 'all' ? 'active' : ''}" onclick="filterWiki('all')">Todas</div>
+                    ${categories.map(c => `<div class="tab ${filters.category === c ? 'active' : ''}" onclick="filterWiki('${c}')">${c}</div>`).join('')}
                 </div>
                 
                 <div id="wiki-grid" class="grid grid-3">
-                    ${pages.map(p => renderWikiCard(p)).join('')}
+                    ${filteredPages.map(p => renderWikiCard(p)).join('')}
                 </div>
+
+                ${filteredPages.length === 0 ? `
+                    <div class="empty-state">
+                        <div class="empty-icon">ðŸ“š</div>
+                        <div class="empty-title">Nenhuma página encontrada</div>
+                    </div>
+                ` : ''}
             `;
         }
 
@@ -3789,14 +3881,9 @@ Contém os verdadeiros nomes dos deuses antigos. Quem os conhece tem poder sobre
             `;
         }
 
-        function filterWiki(category, tab) {
-            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-            tab.classList.add('active');
-            
-            const cards = document.querySelectorAll('#wiki-grid .item-card');
-            cards.forEach(card => {
-                card.style.display = category === 'all' || card.dataset.category === category ? 'block' : 'none';
-            });
+        function filterWiki(category) {
+            viewFilters.wiki.category = category;
+            renderWiki();
         }
 
         async function openWikiPage(name) {
@@ -4325,6 +4412,13 @@ Contém os verdadeiros nomes dos deuses antigos. Quem os conhece tem poder sobre
         async function renderNPCs() {
             const content = document.getElementById('content');
             const npcs = await dbGetAll('npcs');
+            const filters = viewFilters.npcs;
+            const statuses = [...new Set(npcs.map(n => n.status).filter(Boolean))];
+            const filteredNPCs = npcs.filter(n => {
+                const matchesText = matchesSearch(n, ['name', 'affiliation', 'role', 'description'], filters.search);
+                const matchesStatus = filters.status === 'all' || (n.status || 'Desconhecido') === filters.status;
+                return matchesText && matchesStatus;
+            });
             
             content.innerHTML = `
                 <div class="page-header">
@@ -4339,15 +4433,29 @@ Contém os verdadeiros nomes dos deuses antigos. Quem os conhece tem poder sobre
                     </div>
                 </div>
                 
+                ${renderFilterBar('npcs', [
+                    `<div class="form-group" style="flex: 2;">
+                        <label class="form-label">Buscar</label>
+                        <input type="text" class="form-input" value="${escapeHtml(filters.search)}" placeholder="Nome, afiliação ou descrição" onchange="setViewFilter('npcs', 'search', this.value)">
+                    </div>`,
+                    `<div class="form-group">
+                        <label class="form-label">Status</label>
+                        <select class="form-input" onchange="setViewFilter('npcs', 'status', this.value)">
+                            <option value="all" ${filters.status === 'all' ? 'selected' : ''}>Todos</option>
+                            ${statuses.map(status => `<option value="${status}" ${filters.status === status ? 'selected' : ''}>${status}</option>`).join('')}
+                        </select>
+                    </div>`
+                ])}
+                
                 <div class="grid grid-3">
-                    ${npcs.map(n => renderNPCCard(n)).join('')}
+                    ${filteredNPCs.map(n => renderNPCCard(n)).join('')}
                 </div>
                 
-                ${npcs.length === 0 ? `
+                ${filteredNPCs.length === 0 ? `
                     <div class="empty-state">
                         <div class="empty-icon">🎭</div>
-                        <div class="empty-title">Nenhum NPC</div>
-                        <p class="empty-text">Crie NPCs para povoar o mundo de Eldryon.</p>
+                        <div class="empty-title">${npcs.length === 0 ? 'Nenhum NPC' : 'Nenhum NPC encontrado'}</div>
+                        <p class="empty-text">${npcs.length === 0 ? 'Crie NPCs para povoar o mundo de Eldryon.' : 'Ajuste os filtros para ver outros NPCs.'}</p>
                     </div>
                 ` : ''}
             `;
@@ -4686,9 +4794,16 @@ Contém os verdadeiros nomes dos deuses antigos. Quem os conhece tem poder sobre
         async function renderQuests() {
             const content = document.getElementById('content');
             const quests = await dbGetAll('quests');
+            const filters = viewFilters.quests;
             
             const statusOrder = { 'Ativa': 0, 'Disponível': 1, 'Completa': 2, 'Falha': 3 };
             quests.sort((a, b) => statusOrder[a.status] - statusOrder[b.status]);
+            const filteredQuests = quests.filter(q => {
+                const matchesText = matchesSearch(q, ['title', 'description', 'linkedNpc', 'linkedLocation', 'rewards'], filters.search);
+                const matchesStatus = filters.status === 'all' || q.status === filters.status;
+                return matchesText && matchesStatus;
+            });
+            const questStatuses = [...new Set(quests.map(q => q.status).filter(Boolean))];
             
             content.innerHTML = `
                 <div class="page-header">
@@ -4703,14 +4818,28 @@ Contém os verdadeiros nomes dos deuses antigos. Quem os conhece tem poder sobre
                     </div>
                 </div>
                 
+                ${renderFilterBar('quests', [
+                    `<div class="form-group" style="flex: 2;">
+                        <label class="form-label">Buscar</label>
+                        <input type="text" class="form-input" value="${escapeHtml(filters.search)}" placeholder="Título, NPC, local ou recompensa" onchange="setViewFilter('quests', 'search', this.value)">
+                    </div>`,
+                    `<div class="form-group">
+                        <label class="form-label">Status</label>
+                        <select class="form-input" onchange="setViewFilter('quests', 'status', this.value)">
+                            <option value="all" ${filters.status === 'all' ? 'selected' : ''}>Todos</option>
+                            ${['Ativa', 'Disponível', 'Completa', 'Falha'].map(status => `<option value="${status}" ${filters.status === status ? 'selected' : ''}>${status}</option>`).join('')}
+                        </select>
+                    </div>`
+                ])}
+
                 <div class="grid grid-2">
-                    ${quests.map(q => renderQuestCard(q)).join('')}
+                    ${filteredQuests.map(q => renderQuestCard(q)).join('')}
                 </div>
                 
-                ${quests.length === 0 ? `
+                ${filteredQuests.length === 0 ? `
                     <div class="empty-state">
                         <div class="empty-icon">📜</div>
-                        <div class="empty-title">Nenhuma missão</div>
+                        <div class="empty-title">${quests.length === 0 ? 'Nenhuma missão' : 'Nenhuma missão encontrada'}</div>
                     </div>
                 ` : ''}
             `;
@@ -4928,6 +5057,15 @@ Contém os verdadeiros nomes dos deuses antigos. Quem os conhece tem poder sobre
         async function renderItems() {
             const content = document.getElementById('content');
             const items = await dbGetAll('items');
+            const filters = viewFilters.items;
+            const types = [...new Set(items.map(i => i.type).filter(Boolean))];
+            const rarities = [...new Set(items.map(i => i.rarity).filter(Boolean))];
+            const filteredItems = items.filter(i => {
+                const matchesText = matchesSearch(i, ['name', 'type', 'rarity', 'description', 'properties', 'value'], filters.search);
+                const matchesType = filters.type === 'all' || i.type === filters.type;
+                const matchesRarity = filters.rarity === 'all' || i.rarity === filters.rarity;
+                return matchesText && matchesType && matchesRarity;
+            });
             
             content.innerHTML = `
                 <div class="page-header">
@@ -4942,6 +5080,27 @@ Contém os verdadeiros nomes dos deuses antigos. Quem os conhece tem poder sobre
                     </div>
                 </div>
                 
+                ${renderFilterBar('items', [
+                    `<div class="form-group" style="flex: 2;">
+                        <label class="form-label">Buscar</label>
+                        <input type="text" class="form-input" value="${escapeHtml(filters.search)}" placeholder="Nome, tipo, raridade ou propriedade" onchange="setViewFilter('items', 'search', this.value)">
+                    </div>`,
+                    `<div class="form-group">
+                        <label class="form-label">Tipo</label>
+                        <select class="form-input" onchange="setViewFilter('items', 'type', this.value)">
+                            <option value="all" ${filters.type === 'all' ? 'selected' : ''}>Todos</option>
+                            ${types.map(type => `<option value="${type}" ${filters.type === type ? 'selected' : ''}>${type}</option>`).join('')}
+                        </select>
+                    </div>`,
+                    `<div class="form-group">
+                        <label class="form-label">Raridade</label>
+                        <select class="form-input" onchange="setViewFilter('items', 'rarity', this.value)">
+                            <option value="all" ${filters.rarity === 'all' ? 'selected' : ''}>Todas</option>
+                            ${rarities.map(rarity => `<option value="${rarity}" ${filters.rarity === rarity ? 'selected' : ''}>${rarity}</option>`).join('')}
+                        </select>
+                    </div>`
+                ])}
+                
                 <div class="table-container">
                     <table>
                         <thead>
@@ -4954,7 +5113,7 @@ Contém os verdadeiros nomes dos deuses antigos. Quem os conhece tem poder sobre
                             </tr>
                         </thead>
                         <tbody>
-                            ${items.map(i => `
+                            ${filteredItems.map(i => `
                                 <tr onclick="openItemDetail('${i.id}')" style="cursor: pointer;">
                                     <td><strong>${i.name}</strong></td>
                                     <td>${i.type}</td>
@@ -4971,10 +5130,10 @@ Contém os verdadeiros nomes dos deuses antigos. Quem os conhece tem poder sobre
                     </table>
                 </div>
                 
-                ${items.length === 0 ? `
+                ${filteredItems.length === 0 ? `
                     <div class="empty-state">
                         <div class="empty-icon">📦</div>
-                        <div class="empty-title">Nenhum item</div>
+                        <div class="empty-title">${items.length === 0 ? 'Nenhum item' : 'Nenhum item encontrado'}</div>
                     </div>
                 ` : ''}
             `;
@@ -5111,7 +5270,9 @@ Contém os verdadeiros nomes dos deuses antigos. Quem os conhece tem poder sobre
         async function renderSessions() {
             const content = document.getElementById('content');
             const sessions = await dbGetAll('sessions');
+            const filters = viewFilters.sessions;
             sessions.sort((a, b) => b.number - a.number);
+            const filteredSessions = sessions.filter(s => matchesSearch(s, ['title', 'summary', 'notes', 'number'], filters.search));
             
             content.innerHTML = `
                 <div class="page-header">
@@ -5126,8 +5287,15 @@ Contém os verdadeiros nomes dos deuses antigos. Quem os conhece tem poder sobre
                     </div>
                 </div>
                 
+                ${renderFilterBar('sessions', [
+                    `<div class="form-group" style="flex: 2;">
+                        <label class="form-label">Buscar</label>
+                        <input type="text" class="form-input" value="${escapeHtml(filters.search)}" placeholder="Número, título ou resumo" onchange="setViewFilter('sessions', 'search', this.value)">
+                    </div>`
+                ])}
+                
                 <div class="grid grid-2">
-                    ${sessions.map(s => `
+                    ${filteredSessions.map(s => `
                         <div class="card" onclick="openSessionDetail('${s.id}')" style="cursor: pointer;">
                             <div class="card-header">
                                 <div>
@@ -5142,10 +5310,10 @@ Contém os verdadeiros nomes dos deuses antigos. Quem os conhece tem poder sobre
                     `).join('')}
                 </div>
                 
-                ${sessions.length === 0 ? `
+                ${filteredSessions.length === 0 ? `
                     <div class="empty-state">
                         <div class="empty-icon">📅</div>
-                        <div class="empty-title">Nenhuma sessão</div>
+                        <div class="empty-title">${sessions.length === 0 ? 'Nenhuma sessão' : 'Nenhuma sessão encontrada'}</div>
                     </div>
                 ` : ''}
             `;
@@ -6297,6 +6465,131 @@ Contém os verdadeiros nomes dos deuses antigos. Quem os conhece tem poder sobre
             `;
             
             openModal(content);
+        }
+
+        async function handleSearch(event) {
+            if (event.key !== 'Enter') return;
+
+            const query = event.target.value.trim();
+            if (!query) return;
+
+            const normalizedQuery = normalizeText(query);
+            const [wiki, npcs, chars, creatures, quests, items, sessions] = await Promise.all([
+                dbGetAll('wiki_pages'),
+                dbGetAll('npcs'),
+                dbGetAll('characters'),
+                dbGetAll('bestiary'),
+                dbGetAll('quests'),
+                dbGetAll('items'),
+                dbGetAll('sessions')
+            ]);
+
+            const results = [];
+
+            wiki
+                .filter(page => (page.public || currentUser.role === 'master') && matchesSearch(page, ['name', 'category', 'content'], query))
+                .forEach(page => results.push({
+                    type: 'Wiki',
+                    label: page.name,
+                    meta: page.category || 'Página',
+                    action: { fn: 'openWikiPage', value: page.name }
+                }));
+
+            chars
+                .filter(char => matchesSearch(char, ['name', 'class', 'race', 'background', 'notes'], query))
+                .forEach(char => results.push({
+                    type: 'Personagem',
+                    label: char.name,
+                    meta: [char.race, char.class].filter(Boolean).join(' • '),
+                    action: { fn: 'openCharacterDetail', value: char.id }
+                }));
+
+            npcs
+                .filter(npc => matchesSearch(npc, ['name', 'affiliation', 'role', 'description'], query))
+                .forEach(npc => results.push({
+                    type: 'NPC',
+                    label: npc.name,
+                    meta: npc.affiliation || npc.status || 'NPC',
+                    action: { fn: 'openNPCDetail', value: npc.id }
+                }));
+
+            creatures
+                .filter(creature => matchesSearch(creature, ['name', 'type', 'habitat', 'description'], query))
+                .forEach(creature => results.push({
+                    type: 'Bestiário',
+                    label: creature.name,
+                    meta: creature.type || 'Criatura',
+                    action: { fn: 'openCreatureDetail', value: creature.id }
+                }));
+
+            quests
+                .filter(quest => matchesSearch(quest, ['title', 'description', 'linkedNpc', 'linkedLocation', 'rewards'], query))
+                .forEach(quest => results.push({
+                    type: 'Missão',
+                    label: quest.title,
+                    meta: quest.status || 'Missão',
+                    action: { fn: 'openQuestDetail', value: quest.id }
+                }));
+
+            items
+                .filter(item => matchesSearch(item, ['name', 'type', 'rarity', 'description', 'properties'], query))
+                .forEach(item => results.push({
+                    type: 'Item',
+                    label: item.name,
+                    meta: [item.type, item.rarity].filter(Boolean).join(' • '),
+                    action: { fn: 'openItemDetail', value: item.id }
+                }));
+
+            sessions
+                .filter(session => matchesSearch(session, ['title', 'summary', 'notes', 'number'], query))
+                .forEach(session => results.push({
+                    type: 'Sessão',
+                    label: `Sessão ${session.number}: ${session.title}`,
+                    meta: session.date ? formatDate(session.date) : 'Sessão',
+                    action: { fn: 'openSessionDetail', value: session.id }
+                }));
+
+            results.sort((a, b) => {
+                const aStarts = normalizeText(a.label).startsWith(normalizedQuery) ? 0 : 1;
+                const bStarts = normalizeText(b.label).startsWith(normalizedQuery) ? 0 : 1;
+                return aStarts - bStarts || a.label.localeCompare(b.label, 'pt-BR');
+            });
+
+            if (results.length === 0) {
+                showToast('Nenhum resultado encontrado', 'warning');
+                return;
+            }
+
+            searchResults = results.slice(0, 30);
+
+            const content = `
+                <div class="modal-header">
+                    <h3 class="modal-title">Resultados da Busca: "${escapeHtml(query)}"</h3>
+                    <button class="modal-close" onclick="closeModal()">âœ•</button>
+                </div>
+                <div class="modal-body">
+                    ${searchResults.map((result, index) => `
+                        <button class="btn btn-secondary btn-block" onclick="clickSearchResult(${index})" style="justify-content: space-between; margin-bottom: var(--space-sm); text-align: left;">
+                            <span>
+                                <span class="tag">${result.type}</span>
+                                <strong style="margin-left: var(--space-sm);">${escapeHtml(result.label)}</strong>
+                            </span>
+                            <span class="text-muted">${escapeHtml(result.meta || '')}</span>
+                        </button>
+                    `).join('')}
+                </div>
+            `;
+
+            openModal(content);
+        }
+
+        function clickSearchResult(index) {
+            const result = searchResults[index];
+            if (!result) return;
+            closeModal();
+            if (typeof window[result.action.fn] === 'function') {
+                window[result.action.fn](result.action.value);
+            }
         }
 
         // ============================================
