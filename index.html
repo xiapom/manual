@@ -3,21 +3,22 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Crônicas de Sangue e Runas - Grimório de Regras Oficial</title>
+    <title>Crônicas de Sangue e Runas - Manual de Regras Definitivo</title>
     <style>
         :root {
-            --bg-principal: #050507;
-            --bg-card: #0c0c10;
-            --bg-card-hover: #121218;
-            --borda-detalhe: #1f1414;
-            --borda-brilhante: #721c24;
-            --texto-claro: #f5f5fa;
-            --texto-escuro: #8e8e9f;
-            --cor-sangue: #a4161a;
-            --cor-sangue-brilho: #e5383b;
-            --cor-mana: #00b4d8;
+            --bg-principal: #050508;
+            --bg-card: #0d0d12;
+            --bg-card-hover: #14141c;
+            --borda-detalhe: #251616;
+            --borda-brilhante: #851c1c;
+            --texto-claro: #f3f3f9;
+            --texto-escuro: #9494a6;
+            --cor-sangue: #9b111e;
+            --cor-sangue-brilho: #ff3344;
+            --cor-mana: #0077b6;
+            --cor-mana-brilho: #00b4d8;
             --cor-ouro: #e5ba73;
-            --font-code: 'Fira Code', 'Consolas', monospace;
+            --font-code: 'Consolas', 'Fira Code', monospace;
         }
 
         * { box-sizing: border-box; scroll-behavior: smooth; }
@@ -28,19 +29,19 @@
             font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             margin: 0; padding: 0; line-height: 1.6;
             background-image: 
-                radial-gradient(circle at 10% 10%, rgba(164, 22, 26, 0.06) 0%, transparent 40%),
-                radial-gradient(circle at 90% 80%, rgba(0, 180, 216, 0.04) 0%, transparent 40%);
+                radial-gradient(circle at 15% 15%, rgba(155, 17, 30, 0.08) 0%, transparent 40%),
+                radial-gradient(circle at 85% 85%, rgba(0, 119, 182, 0.05) 0%, transparent 40%);
             background-attachment: fixed;
         }
 
-        /* Menu de Navegação Superior */
+        /* Menu Superior Fixo */
         nav {
-            background-color: rgba(12, 12, 16, 0.85);
+            background-color: rgba(13, 13, 18, 0.85);
             backdrop-filter: blur(12px);
             -webkit-backdrop-filter: blur(12px);
             border-bottom: 1px solid var(--borda-detalhe);
             position: fixed; top: 0; width: 100%; z-index: 1000;
-            display: flex; justify-content: center; gap: 15px; padding: 15px 10px;
+            display: flex; justify-content: center; gap: 20px; padding: 15px 10px;
             overflow-x: auto;
         }
 
@@ -52,168 +53,232 @@
 
         nav a:hover {
             color: var(--cor-sangue-brilho);
-            text-shadow: 0 0 10px rgba(229, 56, 59, 0.5);
+            text-shadow: 0 0 8px rgba(255, 51, 68, 0.5);
         }
 
         /* Hero Banner */
         header {
             text-align: center;
-            padding: 150px 20px 70px 20px;
+            padding: 160px 20px 80px 20px;
             background: linear-gradient(to bottom, transparent, var(--bg-principal));
             border-bottom: 1px solid var(--borda-detalhe);
         }
 
         header h1 {
-            font-size: 3.5rem; margin: 0; text-transform: uppercase; letter-spacing: 4px; font-weight: 900;
-            background: linear-gradient(135deg, #fff 40%, var(--cor-sangue-brilho));
+            font-size: 3.8rem; margin: 0; text-transform: uppercase; letter-spacing: 4px; font-weight: 900;
+            background: linear-gradient(135deg, #ffffff 30%, var(--cor-sangue-brilho));
             -webkit-background-clip: text; -webkit-text-fill-color: transparent;
         }
 
-        header p { color: var(--texto-escuro); max-width: 700px; margin: 15px auto 0 auto; font-size: 1.1rem; }
+        header p { color: var(--texto-escuro); max-width: 750px; margin: 15px auto 0 auto; font-size: 1.2rem; font-weight: 300; }
 
-        /* Estrutura de Layout */
+        /* Estrutura Base */
         .layout {
             max-width: 1200px; margin: 40px auto; padding: 0 20px;
             display: grid; grid-template-columns: 3fr 1fr; gap: 40px;
         }
 
-        @media (max-width: 900px) {
+        @media (max-width: 950px) {
             .layout { grid-template-columns: 1fr; }
             .sidebar { display: none; }
         }
 
-        /* Seções Continentais */
+        /* Seções de Conteúdo */
         section {
             background-color: var(--bg-card); border: 1px solid var(--borda-detalhe);
-            border-radius: 14px; padding: 35px; margin-bottom: 35px;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.7);
-            transition: border-color 0.3s ease;
+            border-radius: 16px; padding: 40px; margin-bottom: 40px;
+            box-shadow: 0 12px 40px rgba(0,0,0,0.6);
+            transition: border-color 0.3s ease, transform 0.3s ease;
         }
 
         section:hover { border-color: var(--borda-brilhante); }
 
         h2 {
-            color: var(--cor-ouro); font-size: 1.8rem; margin-top: 0; margin-bottom: 25px;
+            color: var(--cor-ouro); font-size: 2rem; margin-top: 0; margin-bottom: 25px;
             text-transform: uppercase; letter-spacing: 1px; display: flex; align-items: center; gap: 12px;
         }
 
         h2::before {
-            content: ''; display: inline-block; width: 4px; height: 24px;
-            background-color: var(--cor-sangue); border-radius: 2px;
+            content: ''; display: inline-block; width: 5px; height: 26px;
+            background-color: var(--cor-sangue); border-radius: 3px;
         }
 
-        h3 { color: #ffffff; font-size: 1.3rem; margin-top: 30px; margin-bottom: 15px; }
+        h3 { color: #ffffff; font-size: 1.4rem; margin-top: 35px; margin-bottom: 15px; display: flex; align-items: center; gap: 8px; }
 
-        p { color: var(--texto-escuro); margin-bottom: 20px; font-size: 15px; }
+        p { color: var(--texto-escuro); margin-bottom: 20px; font-size: 16px; text-align: justify; }
+
+        ul, ol { color: var(--texto-escuro); font-size: 15px; margin-bottom: 20px; padding-left: 20px; }
+        li { margin-bottom: 8px; }
 
         /* Tabelas Avançadas */
-        .table-box { overflow-x: auto; margin: 25px 0; border-radius: 8px; border: 1px solid #181822; }
+        .table-box { overflow-x: auto; margin: 30px 0; border-radius: 10px; border: 1px solid #22222a; }
         table { width: 100%; border-collapse: collapse; font-size: 14px; text-align: left; }
-        th, td { padding: 16px; border-bottom: 1px solid #181822; }
-        th { background-color: #0f0f14; color: var(--cor-ouro); text-transform: uppercase; font-size: 11px; letter-spacing: 1px; }
+        th, td { padding: 18px; border-bottom: 1px solid #1c1c24; }
+        th { background-color: #111116; color: var(--cor-ouro); text-transform: uppercase; font-size: 11px; letter-spacing: 1px; }
         tr:last-child td { border-bottom: none; }
-        tr:hover td { background-color: rgba(255, 255, 255, 0.01); color: #fff; }
+        tr:hover td { background-color: rgba(255, 255, 255, 0.02); color: #fff; }
 
-        /* Blocos de Regras e Sintaxe Matemática */
-        .alerta-regra {
-            background: linear-gradient(135deg, #161010, #0c0c10);
+        /* Caixas de Explicação e Fórmulas */
+        .caixa-regra {
+            background: linear-gradient(135deg, #181111, #0d0d12);
             border-left: 4px solid var(--cor-sangue);
-            padding: 20px; margin: 25px 0; border-radius: 0 8px 8px 0;
+            padding: 22px; margin: 25px 0; border-radius: 0 10px 10px 0;
         }
 
+        .exemplo-pratico {
+            background: linear-gradient(135deg, #0f141c, #0d0d12);
+            border-left: 4px solid var(--cor-mana);
+            padding: 22px; margin: 25px 0; border-radius: 0 10px 10px 0;
+        }
+        .exemplo-pratico strong { color: var(--cor-mana-brilho); }
+
         .formula {
-            font-family: var(--font-code); background: #191922; padding: 3px 8px;
+            font-family: var(--font-code); background: #1a1a24; padding: 4px 8px;
             color: var(--cor-sangue-brilho); border-radius: 4px; font-size: 14px; font-weight: bold;
         }
 
-        /* Sistema de Ranks Visuais */
+        /* Sistema de Badges de Ranks */
         .badge-rank {
-            display: inline-block; padding: 3px 10px; border-radius: 4px; font-weight: 900;
-            font-size: 12px; text-align: center; min-width: 30px; text-shadow: none;
+            display: inline-block; padding: 4px 12px; border-radius: 5px; font-weight: 900;
+            font-size: 13px; text-align: center; min-width: 35px;
         }
-        .r-s { background-color: #7209b7; color: #f72585; box-shadow: 0 0 10px rgba(247, 37, 133, 0.3); }
+        .r-s { background-color: #7209b7; color: #f72585; box-shadow: 0 0 12px rgba(247, 37, 133, 0.4); }
         .r-a { background-color: #f72585; color: #fff; }
         .r-b { background-color: #ffb703; color: #023047; }
         .r-c { background-color: #2196f3; color: #fff; }
         .r-d { background-color: #4caf50; color: #fff; }
-        .r-e { background-color: #757575; color: #fff; }
+        .r-e { background-color: #616161; color: #fff; }
 
-        /* Grid de Exibições */
-        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; margin-top: 25px; }
+        /* Grid de Cards */
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(290px, 1fr)); gap: 25px; margin-top: 30px; }
         .card {
-            background-color: rgba(18, 18, 24, 0.4); border: 1px solid #181822;
-            padding: 25px; border-radius: 10px; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            background-color: rgba(20, 20, 28, 0.4); border: 1px solid #1f1f2a;
+            padding: 30px; border-radius: 12px; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
         .card:hover {
             background-color: var(--bg-card-hover); border-color: var(--borda-brilhante);
-            transform: translateY(-4px); box-shadow: 0 12px 25px rgba(0,0,0,0.5);
+            transform: translateY(-5px); box-shadow: 0 15px 30px rgba(0,0,0,0.6);
         }
 
-        /* Marcadores Escola de Magia */
+        /* Etiquetas de Tipo de Magia */
         .tag {
-            display: inline-block; font-size: 10px; padding: 2px 8px; border-radius: 4px;
+            display: inline-block; font-size: 10px; padding: 3px 9px; border-radius: 4px;
             font-weight: 800; text-transform: uppercase; margin-bottom: 12px; border: 1px solid;
         }
         .tag.s { background: rgba(164,22,26,0.1); color: var(--cor-sangue-brilho); border-color: rgba(164,22,26,0.3); }
-        .tag.a { background: rgba(229,186,115,0.1); color: var(--cor-ouro); border-color: rgba(229,186,115,0.3); }
-        .tag.d { background: rgba(0,180,216,0.1); color: var(--cor-mana); border-color: rgba(0,180,216,0.3); }
+        .tag.a { background: rgba(225,186,115,0.1); color: var(--cor-ouro); border-color: rgba(225,186,115,0.3); }
+        .tag.d { background: rgba(0,180,216,0.1); color: var(--cor-mana-brilho); border-color: rgba(0,180,216,0.3); }
 
-        /* Widgets da Sidebar */
+        /* Widgets Laterais */
         .widget {
             background-color: var(--bg-card); border: 1px solid var(--borda-detalhe);
-            border-radius: 12px; padding: 20px; position: sticky; top: 80px;
+            border-radius: 14px; padding: 25px; position: sticky; top: 90px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.5);
         }
         .widget h4 { color: #fff; margin: 0 0 15px 0; text-transform: uppercase; font-size: 12px; letter-spacing: 1px; }
-        .widget a { display: block; color: var(--texto-escuro); text-decoration: none; font-size: 13px; padding: 8px 0; transition: color 0.2s; }
-        .widget a:hover { color: var(--cor-ouro); }
+        .widget a { display: block; color: var(--texto-escuro); text-decoration: none; font-size: 14px; padding: 10px 0; transition: color 0.2s; border-bottom: 1px solid #161622; }
+        .widget a:last-child { border-bottom: none; }
+        .widget a:hover { color: var(--cor-ouro); padding-left: 5px; transition: all 0.2s ease; }
 
-        footer { text-align: center; padding: 50px 20px; color: var(--texto-escuro); font-size: 13px; border-top: 1px solid var(--borda-detalhe); margin-top: 60px; }
+        footer { text-align: center; padding: 60px 20px; color: var(--texto-escuro); font-size: 13px; border-top: 1px solid var(--borda-detalhe); margin-top: 80px; background-color: #030305; }
     </style>
 </head>
 <body>
 
-    <!-- MENUS -->
+    <!-- SCRIPT DE NAVEGAÇÃO INTERNA -->
     <nav>
-        <a href="#motor">Motor d20</a>
-        <a href="#ranks">Ranks (E-S)</a>
-        <a href="#atributos">Atributos</a>
+        <a href="#motor">Como Jogar</a>
+        <a href="#atributos">Atributos Explicados</a>
+        <a href="#ranks">Sistema de Ranks</a>
         <a href="#racas">Raças</a>
         <a href="#classes">Classes</a>
         <a href="#grimorio">Grimório</a>
-        <a href="#mestre">Monstros</a>
+        <a href="#mestre">Guia do Mestre</a>
     </nav>
 
-    <!-- HEADER -->
+    <!-- CABEÇALHO -->
     <header>
         <h1>Crônicas de Sangue e Runas</h1>
-        <p>O Compêndio Supremo de Regras. Domine o avanço matemático do Nível 1 ao 100 e controle as magias ordenadas por Ranks.</p>
+        <p>O Manual Supremo de Regras. Aprenda de forma simples e direta a dominar a progressão do Nível 1 ao 100 e comandar feitiços em Ranks devastadores.</p>
     </header>
 
-    <!-- LAYOUT DA LANDING PAGE -->
+    <!-- CONTAINER DA PÁGINA -->
     <div class="layout">
         
         <main>
             <!-- REGRAS BÁSICAS -->
             <section id="motor">
-                <h2>🎲 Sistema de Resolução de Conflitos</h2>
-                <p>Todas as ações dinâmicas que impõem risco de vida ou necessitam de perícia física/mental usam o dado de 20 faces (d20).</p>
+                <h2>🎲 Como Jogar? O Motor d20</h2>
+                <p>Neste RPG, os jogadores narram as ações de seus personagens e o Mestre de Jogo descreve o mundo. Quando um jogador tenta fazer algo difícil ou perigoso (como pular um abismo ou acertar um raio mágico), o d20 decide o resultado.</p>
                 
-                <div class="alerta-regra">
-                    <strong>Fórmula Base de Teste:</strong> <span class="formula">1d20 + Atributo Requerido + Bônus Circunstanciais ≥ CD</span>
+                <div class="caixa-regra">
+                    <strong>A Regra de Ouro:</strong> <span class="formula">Role 1d20 + Seu Atributo Requerido</span>.<br> 
+                    Se o resultado final for <strong>igual ou maior</strong> que a Classe de Dificuldade (CD) estipulada pelo Mestre, você venceu o desafio!
                 </div>
 
-                <h3>Mecânica Crítica: Vantagem e Desvantagem</h3>
-                <p>Quando as condições táticas mudam de acordo com a narrativa do Mestre:</p>
+                <h3>Classe de Dificuldade (CD) Comum</h3>
                 <ul>
-                    <li><strong>Vantagem:</strong> Role 2d20 e adote o <strong>maior</strong> valor (Ex: Alvo pego totalmente desprevenido).</li>
-                    <li><strong>Desvantagem:</strong> Role 2d20 e adote o <strong>menor</strong> valor (Ex: Conjurar sob cegueira ou lama movediça).</li>
+                    <li><strong>CD 10 (Fácil):</strong> Empurrar uma mesa pesada, lembrar de um boato local.</li>
+                    <li><strong>CD 15 (Médio):</strong> Arrombar uma fechadura protegida, desviar de uma armadilha de flecha.</li>
+                    <li><strong>CD 20 (Difícil):</strong> Decifrar runas antigas esquecidas, saltar de um telhado em movimento.</li>
                 </ul>
+
+                <h3>Mecânica de Vantagem e Desvantagem</h3>
+                <p>Situações narrativas podem facilitar ou dificultar muito as coisas na hora dos dados:</p>
+                <ul>
+                    <li><strong>Vantagem (Cenário Favorável):</strong> Você joga <strong>dois dados d20</strong> e escolhe o <strong>maior</strong> número. <em>(Exemplo: Você ataca um alvo por trás enquanto ele está distraído).</em></li>
+                    <li><strong>Desvantagem (Cenário Desfavorável):</strong> Você joga <strong>dois dados d20</strong> e escolhe o <strong>menor</strong> número. <em>(Exemplo: Você tenta disparar uma magia enquanto está atolado em lama até a cintura).</em></li>
+                </ul>
+
+                <div class="exemplo-pratico">
+                    <strong>💡 EXEMPLO PRÁTICO EM MESA:</strong><br>
+                    Um Vampiro tenta usar Furtividade para passar por um guarda. O Mestre define a dificuldade como <strong>CD 15</strong>. O jogador rola o d20 e tira 11. Como ele possui <strong>+4 em Agilidade</strong>, o total é $11 + 4 = 15$. Ele passa raspando pelo guarda sem ser visto!
+                </div>
+            </section>
+
+            <!-- EXPLICAÇÃO COMPLETA DOS ATRIBUTOS -->
+            <section id="atributos">
+                <h2>💪 Atributos Explicados (Nível 1 ao 100)</h2>
+                <p>Seu personagem possui 4 características numéricas primárias. Elas medem suas capacidades e escalam alto, permitindo que você jogue do <strong>Nível 1 até o Nível Maximum (100)</strong>.</p>
+                <p>Na criação de ficha (Nível 1), todos os seus atributos começam em 0 e você recebe <strong>10 pontos</strong> para distribuir. A cada nível que subir, você ganha mais <strong>+3 pontos</strong> para gastar onde quiser.</p>
+
+                <h3>1. Força (FOR)</h3>
+                <p>Mede a força muscular brute, o peso de seus golpes com espadas/machados e sua resistência corporal. </p>
+                <ul>
+                    <li><strong>Aumento Vital:</strong> Cada 1 ponto colocado em FOR aumenta permanentemente seus <strong>Pontos de Vida Máximos em +5</strong>.</li>
+                </ul>
+
+                <h3>2. Agilidade (AGI)</h3>
+                <p>Mede sua velocidade de reação, reflexos, equilíbrio, furtividade e a perícia com arcos ou adagas.</p>
+                <ul>
+                    <li><strong>Cálculo de Armadura:</strong> Sua <strong>Defesa Física</strong> padrão é igual a <span class="formula">10 + Sua Agilidade</span>. Quanto maior, mais difícil é para os monstros te acertarem fisicamente.</li>
+                </ul>
+
+                <h3>3. Mente (MEN)</h3>
+                <p>Mede seu intelecto, memória, raciocínio lógico e a capacidade de detectar ilusões ou segredos.</p>
+                <ul>
+                    <li><strong>Ataque Místico:</strong> É o atributo usado para conjurar **Magias Arcanas e Sombrias**.</li>
+                    <li><strong>Aumento de Energia:</strong> Cada 1 ponto colocado em MEN aumenta permanentemente seus <strong>Pontos de Mana Máximos em +5</strong>.</li>
+                </ul>
+
+                <h3>4. Espírito (ESP)</h3>
+                <p>Mede sua força de vontade, magnetismo pessoal, sensibilidade mística e sua fé/ligação com as energias da natureza.</p>
+                <ul>
+                    <li><strong>Ataque Místico:</strong> É o atributo usado para conjurar **Magias Elementais e Divinas**.</li>
+                    <li><strong>Barreira Passiva:</strong> Cada 1 ponto colocado em ESP concede <strong>+1 de Resistência Mágica fixa</strong> (reduz dano de feitiços inimigos).</li>
+                </ul>
+
+                <div class="caixa-regra">
+                    <strong>⚡ Fórmulas de Status Automáticas (Sempre atualize ao subir nível):</strong><br><br>
+                    • <strong>Pontos de Vida (PV Máx):</strong> <span class="formula">30 + (Nível × 10) + (FOR × 5)</span> — Acabou a vida, o personagem morre.<br><br>
+                    • <strong>Pontos de Mana (PM Máx):</strong> <span class="formula">20 + (Nível × 8) + (MEN × 5)</span> — Combustível gasto para usar suas magias.
+                </div>
             </section>
 
             <!-- SISTEMA DE RANKS -->
             <section id="ranks">
-                <h2>📊 Hierarquia de Ranks (Nível 1 ao 100)</h2>
-                <p>Neste universo, a capacidade de canalização de energia é estritamente regulada pelo nível biológico do usuário.</p>
+                <h2>📊 Como Funcionam os Ranks de Magia?</h2>
+                <p>Neste sistema, as magias são separadas em 6 Ranks de poder (Do E ao S). Seu personagem só pode aprender e conjurar magias de um determinado Rank se possuir o nível mínimo exigido. Tentar forçar uma magia além do seu limite destrói o corpo do conjurador.</p>
                 
                 <div class="table-box">
                     <table>
@@ -221,103 +286,89 @@
                             <tr>
                                 <th>Rank</th>
                                 <th>Nível Mínimo</th>
-                                <th>Escala de Destruição Narrativa</th>
+                                <th>O que representa no mundo? (Escala de Destruição)</th>
                             </tr>
                         </thead>
                         <tbody>
                             <tr>
-                                <td><span class="badge-rank r-e">E</span></td>
+                                <td><span class="badge-rank r-e">Rank E</span></td>
                                 <td>Nível 1</td>
-                                <td><strong>Escala Local:</strong> Feitiços utilitários simples, flechas de energia, pequenos reparos.</td>
+                                <td><strong>Escala Básica:</strong> Magias de iniciantes. Dardos de energia, curas leves de arranhões e truques.</td>
                             </tr>
                             <tr>
-                                <td><span class="badge-rank r-d">D</span></td>
+                                <td><span class="badge-rank r-d">Rank D</span></td>
                                 <td>Nível 20</td>
-                                <td><strong>Escala de Combate:</strong> Capaz de dizimar gangues urbanas ou pequenos bandos de feras selvagens.</td>
+                                <td><strong>Escala Avançada:</strong> Magias de combate de mercenários. Derruba grupos de oponentes comuns com facilidade.</td>
                             </tr>
                             <tr>
-                                <td><span class="badge-rank r-c">C</span></td>
+                                <td><span class="badge-rank r-c">Rank C</span></td>
                                 <td>Nível 40</td>
-                                <td><strong>Escala de Pelotão:</strong> Feitiços de impacto em área que rompem paredes de escudos e linhas de frente.</td>
+                                <td><strong>Escala de Destacamento:</strong> Feitiços massivos em área que explodem frentes de batalha e quebram barreiras.</td>
                             </tr>
                             <tr>
-                                <td><span class="badge-rank r-b">B</span></td>
+                                <td><span class="badge-rank r-b">Rank B</span></td>
                                 <td>Nível 60</td>
-                                <td><strong>Escala de Cerco:</strong> Destruição de fortificações inteiras e invocações de entidades subordinadas.</td>
+                                <td><strong>Escala Destrutiva:</strong> Conjurações capazes de deitar muralhas de castelos abaixo e rituais proibidos.</td>
                             </tr>
                             <tr>
-                                <td><span class="badge-rank r-a">A</span></td>
+                                <td><span class="badge-rank r-a">Rank A</span></td>
                                 <td>Nível 80</td>
-                                <td><strong>Escala Regional:</strong> Mudança drástica de clima geográfico, aniquilação de divisões militares.</td>
+                                <td><strong>Escala Lendária:</strong> Magias que mudam o clima de mapas inteiros ou evaporam guarnições militares com um comando.</td>
                             </tr>
                             <tr>
-                                <td><span class="badge-rank r-s">S</span></td>
+                                <td><span class="badge-rank r-s">Rank S</span></td>
                                 <td>Nível 100</td>
-                                <td><strong>Escala Cataclísmica:</strong> Ruptura da barreira de espaço-tempo. Magias que alteram as leis da realidade.</td>
+                                <td><strong>Escala Divina/Cataclísmica:</strong> O topo absoluto do poder. Rasga o tecido do espaço-tempo e altera as leis da física.</td>
                             </tr>
                         </tbody>
                     </table>
                 </div>
             </section>
 
-            <!-- ATRIBUTOS E STATUS -->
-            <section id="atributos">
-                <h2>📈 Construção Matemática e Status</h2>
-                <p>Diferente de sistemas estáticos, aqui seus números sobem a cada nível para acompanhar a progressão épica.</p>
-                <p>No <strong>Nível 1</strong>, você ganha <strong>10 pontos</strong>. A cada nível subsequente até o 100, você ganha <strong>+3 pontos por nível</strong> (Totalizando 307 pontos no nível máximo).</p>
-
-                <div class="alerta-regra">
-                    <strong>Fórmulas de Status Vitalício:</strong><br><br>
-                    • <strong>Pontos de Vida (PV Máx):</strong> <span class="formula">30 + (Nível × 10) + (FOR × 5)</span><br><br>
-                    • <strong>Pontos de Mana (PM Máx):</strong> <span class="formula">20 + (Nível × 8) + (MEN × 5)</span><br><br>
-                    • <strong>Defesa Física Padrão:</strong> <span class="formula">10 + AGI</span>
-                </div>
-            </section>
-
             <!-- RAÇAS -->
             <section id="racas">
-                <h2>🧬 Linhagens Ancestrais</h2>
-                <p>Escolha sua origem biológica. Ela altera seus atributos iniciais e concede traços permanentes:</p>
+                <h2>🧬 Escolha sua Raça (Sua Origem)</h2>
+                <p>As raças concedem vantagens diretas nos atributos e uma habilidade especial que muda sua forma de jogar:</p>
                 
                 <div class="table-box">
                     <table>
                         <thead>
                             <tr>
-                                <th>Linhagem</th>
-                                <th>Bônus de Atributo Inicial</th>
-                                <th>Habilidade Passiva Exclusiva</th>
+                                <th>Raça</th>
+                                <th>Atributos Iniciais</th>
+                                <th>Habilidade Especial Permanente</th>
                             </tr>
                         </thead>
                         <tbody>
                             <tr>
                                 <td><strong>Humano</strong></td>
-                                <td>+2 em quaisquer dois atributos</td>
-                                <td><strong>Determinação:</strong> Abaixo de 50% de PV, ganha +2 em testes de d20 e joga os dados de dano duas vezes, selecionando o maior valor.</td>
+                                <td>+2 em dois atributos livres</td>
+                                <td><strong>Determinação:</strong> Se seus PV caírem para menos de 50%, você ganha +2 em todas as rolagens e rola os dados de dano das suas magias duas vezes, escolhendo o maior valor.</td>
                             </tr>
                             <tr>
                                 <td><strong>Vampiro</strong></td>
                                 <td>+3 em AGI ou MEN</td>
-                                <td><strong>Drenar Sangue:</strong> 1x por combate, cura metade do dano desferido corporalmente em PV ou PM. Sofre dano duplo de magias de Luz.</td>
+                                <td><strong>Drenar Sangue:</strong> Uma vez por combate, ao causar dano físico corporal em alguém, recupera metade do dano em vida (PV) ou mana (PM). Toma dano dobrado de Magia de Luz.</td>
                             </tr>
                             <tr>
                                 <td><strong>Demônio</strong></td>
                                 <td>+3 em FOR ou MEN</td>
-                                <td><strong>Pacto Ardente:</strong> Imunidade absoluta ao elemento Fogo. Pode queimar 3 PV para dar +1d6 de fogo na próxima magia.</td>
+                                <td><strong>Pacto Ardente:</strong> Você não sofre dano de Fogo. Além disso, pode escolher perder 3 PV do próprio corpo para somar +1d6 de fogo em sua próxima magia ofensiva.</td>
                             </tr>
                             <tr>
                                 <td><strong>Anão</strong></td>
                                 <td>+3 em FOR ou ESP</td>
-                                <td><strong>Resistência Rúnica:</strong> Proteção passiva contra frio, fogo e eletricidade (reduz todo dano sofrido desses elementos em -5 fixos).</td>
+                                <td><strong>Resistência Rúnica:</strong> Você possui uma proteção que diminui todo dano recebido por magias de Fogo, Gelo ou Raio em -5 pontos fixos. Usar armaduras pesadas não diminui sua Agilidade.</td>
                             </tr>
                             <tr>
                                 <td><strong>Dracônico</strong></td>
                                 <td>+3 em ESP ou FOR</td>
-                                <td><strong>Sopro Elemental:</strong> Por 3 PM, cospe energia elemental em cone causando 2d6 + ESP de dano (Inimigos rolam AGI para tentar reduzir o dano).</td>
+                                <td><strong>Sopro Elemental:</strong> Gastando 3 PM, você solta um sopro em área em forma de cone causando 2d6 + ESP de dano elemental (Inimigos rolam teste de AGI para tentar reduzir o dano).</td>
                             </tr>
                             <tr>
                                 <td><strong>Híbrido</strong></td>
-                                <td>+1 em dois atributos distintos</td>
-                                <td><strong>Herança Misturada:</strong> Escolha duas raças; você adquire as passivas e ativas de ambas de forma simultânea.</td>
+                                <td>+1 em dois atributos livres</td>
+                                <td><strong>Herança Misturada:</strong> Escolha duas raças progenitoras da lista acima. Você herda perfeitamente as passivas e ativas de ambas as raças ao mesmo tempo.</td>
                             </tr>
                         </tbody>
                     </table>
@@ -326,102 +377,110 @@
 
             <!-- CLASSES -->
             <section id="classes">
-                <h2>⚔️ Profissões e Arquétipos de Combate</h2>
-                <p>As classes ditam quanto seus atributos derivados de Vida e Mana crescem por nível:</p>
+                <h2>⚔️ Escolha sua Classe (Seu Estilo de Luta)</h2>
+                <p>Sua classe é o seu treinamento de combate. Ela define o foco de seus atributos e o ganho exato de Vida e Mana toda vez que você sobe de nível:</p>
                 
                 <div class="grid">
                     <div class="card">
                         <h3>Gladiador Rúnico</h3>
-                        <p><strong>Foco:</strong> FOR / ESP | <strong>Ganho:</strong> +6 PV e +1 PM por nível.</p>
-                        <p><small><em>Lâmina Elemental:</em> Ao acertar ataques físicos, gaste 1 PM para imbuir a lâmina com +1d6 de dano elemental bônus.</small></p>
+                        <p><strong>Atributos Foco:</strong> FOR e ESP</p>
+                        <p><strong>Crescimento por Nível:</strong> <span class="formula">+6 PV</span> e <span class="formula">+1 PM</span></p>
+                        <hr style="border: 1px solid var(--borda-detalhe); margin: 15px 0;">
+                        <p style="font-size: 13.5px; color: var(--texto-escuro);"><strong>Habilidade Passiva (Lâmina Elemental):</strong> Ao acertar um ataque físico com sua arma, você pode gastar 1 PM para infundir a lâmina e infligir +1d6 de dano elemental extra.</p>
                     </div>
                     <div class="card">
                         <h3>Algoz da Noite</h3>
-                        <p><strong>Foco:</strong> AGI / MEN | <strong>Ganho:</strong> +4 PV e +2 PM por nível.</p>
-                        <p><small><em>Golpe de Misericórdia:</em> Ataques causam o dobro de dano total se o alvo estiver cego, surpreso ou sob controle da mente.</small></p>
+                        <p><strong>Atributos Foco:</strong> AGI e MEN</p>
+                        <p><strong>Crescimento por Nível:</strong> <span class="formula">+4 PV</span> e <span class="formula">+2 PM</span></p>
+                        <hr style="border: 1px solid var(--borda-detalhe); margin: 15px 0;">
+                        <p style="font-size: 13.5px; color: var(--texto-escuro);"><strong>Habilidade Passiva (Golpe de Misericórdia):</strong> Seus ataques físicos ou magias causam o <strong>dobro de dano total</strong> caso o alvo esteja cego, surpreso pelas costas ou sob controle mental.</p>
                     </div>
                     <div class="card">
                         <h3>Feiticeiro do Caos</h3>
-                        <p><strong>Foco:</strong> MEN / AGI | <strong>Ganho:</strong> +3 PV e +5 PM por nível.</p>
-                        <p><small><em>Fluxo Instável:</em> Se tirar o valor máximo no dado de dano de magias, o dado explode, permitindo rolar mais um dado e somar.</small></p>
+                        <p><strong>Atributos Foco:</strong> MEN e AGI</p>
+                        <p><strong>Crescimento por Nível:</strong> <span class="formula">+3 PV</span> e <span class="formula">+5 PM</span></p>
+                        <hr style="border: 1px solid var(--borda-detalhe); margin: 15px 0;">
+                        <p style="font-size: 13.5px; color: var(--texto-escuro);"><strong>Habilidade Passiva (Fluxo Instável):</strong> Sorte caótica. Sempre que você rolar o maior valor possível no dado de dano de suas magias (ex: tirar 6 no d6), o dado explode: role mais um dado e some tudo.</p>
                     </div>
                     <div class="card">
                         <h3>Taumaturgo</h3>
-                        <p><strong>Foco:</strong> ESP / FOR | <strong>Ganho:</strong> +5 PV e +3 PM por nível.</p>
-                        <p><small><em>Elo Protetor:</em> Conceder escudos ou magias de cura para aliados restaura 2 PM imediatamente para você.</small></p>
+                        <p><strong>Atributos Foco:</strong> ESP e FOR</p>
+                        <p><strong>Crescimento por Nível:</strong> <span class="formula">+5 PV</span> e <span class="formula">+3 PM</span></p>
+                        <hr style="border: 1px solid var(--borda-detalhe); margin: 15px 0;">
+                        <p style="font-size: 13.5px; color: var(--texto-escuro);"><strong>Habilidade Passiva (Elo Protetor):</strong> Sempre que você usar um feitiço para curar a vida de um aliado ou colocar um escudo mágico nele, você recupera 2 PM instantaneamente.</p>
                     </div>
                 </div>
             </section>
 
-            <!-- GRIMÓRIO DE MAGIAS -->
+            <!-- GRIMÓRIO -->
             <section id="grimorio">
-                <h2>🔮 O Grande Grimório de Ranks</h2>
-                <p>Inimigos devem superar a dificuldade de resistência do conjurador calculada por: <span class="formula">CD = 10 + Atributo de Conjuração</span>.</p>
+                <h2>🔮 Grimório de Magias de Exemplo</h2>
+                <p>Quando você lança uma magia que afeta um inimigo, a dificuldade para ele escapar ou resistir ao seu feitiço é calculada como: <span class="formula">CD = 10 + Seu Atributo de Conjuração (MEN ou ESP)</span>.</p>
                 
                 <div class="grid">
-                    <!-- RANK E -->
+                    <!-- FEITIÇO 1 -->
                     <div class="card">
-                        <span class="badge-rank r-e">Rank E</span> <span class="tag d">Arcana</span>
+                        <span class="badge-rank r-e">Rank E</span> <span class="tag d">Arcana (MEN)</span>
                         <h3>Dardo Sombrio</h3>
                         <p><strong>Custo:</strong> 5 PM</p>
-                        <p>Causa <span class="formula">1d6 + MEN</span> de dano de Trevas. Alvo rola teste de ESP ou fica Cego por 1 turno.</p>
+                        <p>Dispara um projétil espiral de sombras puras. Causa <span class="formula">1d6 + MEN</span> de dano de Trevas. O alvo deve fazer um teste de Espírito; se falhar, fica cego por 1 turno.</p>
                     </div>
-                    <!-- RANK C -->
+                    <!-- FEITIÇO 2 -->
                     <div class="card">
-                        <span class="badge-rank r-c">Rank C</span> <span class="tag a">Elemental</span>
-                        <h3>Fúria da Terra</h3>
+                        <span class="badge-rank r-c">Rank C</span> <span class="tag a">Elemental (ESP)</span>
+                        <h3>Terremoto Rúnico</h3>
                         <p><strong>Custo:</strong> 45 PM</p>
-                        <p>Causa <span class="formula">4d10 + ESP</span> de dano de esmagamento. Inimigos na área são derrubados ao chão se falharem em AGI.</p>
+                        <p>Racha o solo sob o comando do seu cajado. Causa <span class="formula">4d10 + ESP</span> de dano físico. Inimigos na área caem no chão imediatamente, perdendo a vez a menos que passem num teste de Agilidade.</p>
                     </div>
-                    <!-- RANK S -->
+                    <!-- FEITIÇO 3 -->
                     <div class="card">
-                        <span class="badge-rank r-s">Rank S</span> <span class="tag s">Sangue</span>
-                        <h3>Fervura Maximal</h3>
-                        <p><strong>Custo:</strong> 400 PM + 50 PV</p>
-                        <p>O sangue de todos os alvos num raio de 30m entra em ebulição simultânea. Causa <span class="formula">15d12 + MEN</span> de dano letal real.</p>
+                        <span class="badge-rank r-s">Rank S</span> <span class="tag s">Sangue (MEN)</span>
+                        <h3>Ruína Maximal</h3>
+                        <p><strong>Custo:</strong> 400 PM + 50 PV do Próprio Conjurador</p>
+                        <p>O feitiço proibido absoluto. Faz o sangue de todos os seres vivos em um raio de 30 metros entrar em ebulição instantânea. Inflige <span class="formula">15d12 + MEN</span> de dano real massivo.</p>
                     </div>
                 </div>
             </section>
 
-            <!-- DESIGN DE MONSTROS (MESTRE) -->
+            <!-- GUIA DO MESTRE / CRIAR MONSTROS -->
             <section id="mestre">
-                <h2>👹 Manual de Criação de Ameaças</h2>
-                <p>Para o Mestre calibrar combates balanceados rapidamente de acordo com o nível atual médio da mesa de jogadores:</p>
+                <h2>👹 Guia do Mestre: Criando Monstros Rápidos</h2>
+                <p>Mestre de Jogo, use esta tabela oficial balanceada para criar oponentes ou criaturas em poucos segundos, dependendo do nível em que o grupo de jogadores se encontra:</p>
                 
                 <div class="table-box">
                     <table>
                         <thead>
                             <tr>
-                                <th>Nível da Ameaça</th>
-                                <th>Pontos de Vida (PV)</th>
-                                <th>Bônus de Acerto / CD</th>
-                                <th>Dano do Ataque Padrão</th>
+                                <th>Faixa de Nível do Grupo</th>
+                                <th>Pontos de Vida (PV) do Monstro</th>
+                                <th>Bônus de Acerto no Dado / CD</th>
+                                <th>Dano do Ataque do Monstro</th>
                             </tr>
                         </thead>
                         <tbody>
                             <tr>
-                                <td><strong>Nível 1 a 20</strong></td>
+                                <td><strong>Nível 1 ao 20 (Lacaios)</strong></td>
                                 <td>15 a 150 PV</td>
                                 <td>+3 no dado / CD 12</td>
-                                <td>1d8 + 2 de dano</td>
+                                <td>1d8 + 2 de dano físico ou mágico</td>
                             </tr>
                             <tr>
-                                <td><strong>Nível 21 a 50</strong></td>
+                                <td><strong>Nível 21 ao 50 (Inimigos Comuns)</strong></td>
                                 <td>200 a 600 PV</td>
                                 <td>+8 no dado / CD 15</td>
-                                <td>3d6 + 10 de dano</td>
+                                <td>3d6 + 10 de dano físico ou mágico</td>
                             </tr>
                             <tr>
-                                <td><strong>Nível 51 a 80</strong></td>
+                                <td><strong>Nível 51 ao 80 (Monstros de Elite)</strong></td>
                                 <td>700 a 2000 PV</td>
                                 <td>+15 no dado / CD 20</td>
-                                <td>5d10 + 25 de dano</td>
+                                <td>5d10 + 25 de dano físico ou mágico</td>
                             </tr>
                             <tr>
-                                <td><strong>Nível 81 a 100 (Chefes)</strong></td>
+                                <td><strong>Nível 81 ao 100 (Chefões de Campanha)</strong></td>
                                 <td>3500+ PV</td>
                                 <td>+25 no dado / CD 28</td>
-                                <td>8d12 + 50 de dano</td>
+                                <td>8d12 + 50 de dano devastador</td>
                             </tr>
                         </tbody>
                     </table>
@@ -429,25 +488,25 @@
             </section>
         </main>
 
-        <!-- SIDEBAR -->
+        <!-- SIDEBAR DE SELEÇÃO RÁPIDA -->
         <aside class="sidebar">
             <div class="widget">
-                <h4>Navegação do Livro</h4>
-                <a href="#motor">1. Rolagem com d20</a>
-                <a href="#ranks">2. Escalabilidade de Ranks</a>
-                <a href="#atributos">3. Fórmulas de Status</a>
-                <a href="#racas">4. Escolha de Raças</a>
-                <a href="#classes">5. Escolha de Classes</a>
-                <a href="#grimorio">6. Grimório de Magias</a>
-                <a href="#mestre">7. Guia do Mestre</a>
+                <h4>Sumário do Livro</h4>
+                <a href="#motor">1. O Motor d20</a>
+                <a href="#atributos">2. Atributos Fundamentais</a>
+                <a href="#ranks">3. Funcionamento dos Ranks</a>
+                <a href="#racas">4. Lista de Raças</a>
+                <a href="#classes">5. Lista de Classes</a>
+                <a href="#grimorio">6. O Livro de Magias</a>
+                <a href="#mestre">7. Criação de Monstros</a>
             </div>
         </aside>
 
     </div>
 
-    <!-- FOOTER -->
+    <!-- RODAPÉ -->
     <footer>
-        <p>Crônicas de Sangue e Runas v1.5 — Sistema de Alta Progressão. Licença Livre de Criação.</p>
+        <p>Crônicas de Sangue e Runas v2.0 — Sistema Aberto de Alta Progressão para RPG de Mesa.</p>
     </footer>
 
 </body>
